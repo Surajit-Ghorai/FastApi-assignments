@@ -29,13 +29,13 @@ class QuizResult(BaseModel):
     score: int
     correct_answers: dict
 
-@app.get("/quizzes/{course_id}/{quiz_id}")
+@app.get("/quizzes/{course_id}/{quiz_id}", response_model= list[QuizRequest], status_code=status.HTTP_200_OK)
 async def get_quiz(course_id: int, quiz_id: int, db: Session = Depends(get_db)):
-    quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
+    quiz = db.query(Quiz).filter(Quiz.id == quiz_id).all()
     db.close()
     if quiz is None:
         raise HTTPException(status_code=404, detail="Quiz not found")
-    return quiz.questions
+    return quiz
 
 @app.post("/submit")
 async def submit_quiz(submit_request: SubmitRequest):
